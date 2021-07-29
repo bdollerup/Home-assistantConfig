@@ -265,14 +265,14 @@ input_select:
 
 input_boolean:
   home_occupancy_dad_1plus8t:
-    name: Indicate that Bjarne is home
+    name: Indicate that Dad is home
     icon: mdi:cellphone
 
   home_occupancy_mom_iphonexs:
-    name: Indicate that Liset is home
+    name: Indicate that Mom is home
     icon: mdi:cellphone
 
   home_occupancy_son_iphone11:
-    name: Indicate that Jonas is home
+    name: Indicate that Son is home
     icon: mdi:cellphone
 
