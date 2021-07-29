@@ -110,7 +110,7 @@ notify:
 
 ihc:
   - url: "http://xxx.xxx.xxx.xxx"
-    username: hass
+    username: !secret ihc_username
     password: !secret ihc_password
     auto_setup: false
     info: true
@@ -206,10 +206,6 @@ ihc:
         note: Living Room Light behind chair
 
     switch:
-      # - id: 307546
-      #   name: input307546
-      #   note: Patio Door Switch (Lower Left)
-
       - id: 352347
         name: output352347
         note: Master Bedroom Headrest Light
@@ -268,24 +264,15 @@ input_select:
     icon: mdi:remote
 
 input_boolean:
-  home_occupancy_bbd_1plus8t:
+  home_occupancy_dad_1plus8t:
     name: Indicate that Bjarne is home
     icon: mdi:cellphone
 
-  home_occupancy_ld_iphonexs:
+  home_occupancy_mom_iphonexs:
     name: Indicate that Liset is home
     icon: mdi:cellphone
 
-  home_occupancy_jbd_iphone11:
+  home_occupancy_son_iphone11:
     name: Indicate that Jonas is home
     icon: mdi:cellphone
 
-timer:
-  testtimer:
-    name: "Test Timer for 45 seconds"
-    icon: mdi:camera-timer
-    duration: "00:00:45"
-  luminosity_timer:
-    name: "Living Room Luminosity 30 Minutes Timer "
-    icon: mdi:camera-timer
-    duration: "00:30:00"
