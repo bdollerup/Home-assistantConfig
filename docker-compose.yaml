@@ -1,0 +1,163 @@
+version: "3.8"
+services:
+  # HomeAssistant
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/raspberrypi4-homeassistant:2021.7.0
+    volumes:
+      - /home/homeassistant/.homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    privileged: true
+    labels:
+      com.centurylinklabs.watchtower.monitor-only: "true"
+    network_mode: "host"
+    depends_on:
+      - mosquitto
+      - influxdb
+      - zwave-js
+
+  # Mosquitto
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    volumes:
+      - /home/docker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - /home/docker/mosquitto/data:/mosquitto/data
+      - /home/docker/mosquitto/log:/mosquitto/log
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+  # Grafana
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.monitor-only: "true"
+    volumes:
+      - /home/docker/grafana:/var/lib/grafana
+    user: "0:0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+
+  # Influxdb
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8.6
+    restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.monitor-only: "true"
+    volumes:
+      - /home/docker/influxdb:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+
+  # Portainer
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/docker/portainer/data:/data
+    ports:
+      - "9000:9000"
+
+  # zwave-js
+  zwave-js:
+    container_name: zwave-js
+    image: zwavejs/zwavejs2mqtt:latest
+    restart: always
+    labels:
+      com.centurylinklabs.watchtower.monitor-only: "true"
+    environment:
+      - TZ=Europe/Copenhagen
+    devices:
+      - /dev/ttyACM0
+    volumes:
+      - /home/docker/zwave-js:/usr/src/app/store
+    ports:
+      - "8091:8091"
+      - "3100:3000"
+
+  # cadvisor
+  cadvisor:
+    container_name: cadvisor
+    image: budry/cadvisor-arm:latest
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "8081:8080"
+    privileged: true
+    devices:
+      - "/dev/kmsg"
+
+  # Watchtower
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Europe/Copenhagen
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_NOTIFICATIONS=email
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=${SENDER_EMAIL}
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=${RECIEVER_EMAIL}
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.gmail.com
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=587
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=${USER_GMAIL}
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=${PASSWORD}
+      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY=10
+
+  # Appdaemon
+  appdaemon:
+    container_name: appdaemon
+    image: acockburn/appdaemon:dev
+    depends_on:
+      - homeassistant
+    restart: always
+    privileged: true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/docker/appdaemon/conf:/conf
+    environment:
+      - HA_URL=http://${SERVER_IP}:8123
+      - TOKEN=${HA_APPDAEMON_KEY}
+      - DASH_URL=http://${SERVER_IP}:5050
+    ports:
+      - "5050:5050"
+
+  # Tasmoadmin
+  tasmoadmin:
+    container_name: tasmoadmin
+    image: raymondmm/tasmoadmin:latest
+    restart: always
+    volumes:
+      - /home/docker/tasmoadmin/data:/data
+    ports:
+      - "8082:80"
+
+  # ESPHome
+  esphome:
+    container_name: esphome
+    image: esphome/esphome
+    network_mode: "host"
+    restart: always
+    volumes:
+      - /home/homeassistant/esphome:/esphome
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=Europe/Copenhagen
