@@ -1,0 +1,291 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+alert: !include alerts.yaml
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+light: !include lights.yaml
+binary_sensor: !include binary_sensors.yaml
+sensor: !include sensors.yaml
+switch: !include switches.yaml
+template: !include template.yaml
+weather: !include weather.yaml
+
+homeassistant:
+  customize: !include customize.yaml
+
+recorder:
+  exclude:
+    domains:
+      - weather
+    entity_globs:
+      - sensor.*_uptime
+      - sensor.*_uptime_2
+      - sensor.*_rx
+      - sensor.*_rx_2
+      - sensor.*_tx
+      - sensor.*_tx_2
+    entities:
+      - sensor.time_of_day
+
+history:
+  exclude:
+    domains:
+      - weather
+    entity_globs:
+      - sensor.*_uptime
+      - sensor.*_uptime_2
+      - sensor.*_rx
+      - sensor.*_rx_2
+      - sensor.*_tx
+      - sensor.*_tx_2
+    entities:
+      - sensor.time_of_day
+
+# https://github.com/iprak/yahoofinance
+
+yahoofinance:
+  symbols:
+    - MSFT
+    - GOOGL
+    - AMZN
+    - NFLX
+    - AAPL
+    - INTC
+    - BTC-USD
+  scan_interval:
+    minutes: 60
+  show_trending_icon: true
+
+influxdb:
+  api_version: 1
+  host: xxx.xxx.xxx.xxx
+  port: 8086
+  database: home_assistant
+  ssl: false
+  max_retries: 3
+  default_measurement: state
+  tags_attributes:
+    - friendly_name
+  tags:
+    instance: production
+    source: homeassistant
+  exclude:
+    entity_globs:
+      - sensor.*_uptime
+      - sensor.*_uptime_2
+      - sensor.*_rx
+      - sensor.*_rx_2
+      - sensor.*_tx
+      - sensor.*_tx_2
+    entities:
+      - sensor.time_of_day
+
+spotify:
+  client_id: !secret spotify_client_id
+  client_secret: !secret spotify_client_secret
+
+spotcast:
+  sp_dc: !secret spotcast_sp_dc
+  sp_key: !secret spotcast_sp_key
+
+notify:
+  - platform: clicksend
+    name: ClickSend
+    username: !secret clicksend_username
+    api_key: !secret clicksend_api_key
+    recipient: +xxxxxxxxxxxx
+  - platform: nfandroidtv
+    name: LivingRoom
+    host: xxx.xxx.xxx.xxx
+
+ihc:
+  - url: "http://xxx.xxx.xxx.xxx"
+    username: hass
+    password: !secret ihc_password
+    auto_setup: false
+    info: true
+
+    light:
+      - id: 189787
+        name: output189787
+        note: Front Lights
+
+      - id: 309083
+        name: output309083
+        note: Patio Light
+
+      - id: 344155
+        name: output344155
+        note: Master Bedroom Ceiling Light
+
+      - id: 334683
+        name: output334683
+        note: Guest Bedroom Ceiling Light
+
+      - id: 475229
+        name: output475229
+        note: light over dinning table
+        dimmable: true
+
+      - id: 245595
+        name: output245595
+        note: ceiling spot lights in commonroom
+
+      - id: 602974
+        name: output602974
+        note: right wall outlet in commonroom
+
+      - id: 30811
+        name: output30811
+        note: Kitchen Table Light
+
+      - id: 138331
+        name: output138331
+        note: ceiling spot lights in kitchen
+
+      - id: 130139
+        name: output130139
+        note: Hallway Ceiling Light
+
+      - id: 140123
+        name: output140123
+        note: ceiling light in guest bathroom
+
+      - id: 187995
+        name: output187995
+        note: Entrance Ceiling Light
+
+      - id: 190555
+        name: output190555
+        note: Entrance Cupboard Light
+
+      - id: 159067
+        name: output159067
+        note: Game Room Ceiling Light
+
+      - id: 121179
+        name: output121179
+        note: Kids Bedroom Ceiling Light
+
+      - id: 140123
+        name: output140123
+        note: Guest Bathroom Ceiling Light
+
+      - id: 141915
+        name: output141915
+        note: Guest Bathroom Vanity Light
+
+      - id: 218715
+        name: output218715
+        note: ceiling light in office
+
+      - id: 206939
+        name: output206939
+        note: master bathroom shower light
+
+      - id: 209499
+        name: output209499
+        note: Master Bathroom Ceiling Light
+
+      - id: 290395
+        name: output290395
+        note: Living Room Glass Tabel and TV Lights
+
+      - id: 612702
+        name: output612702
+        note: Living Room Light behind chair
+
+    switch:
+      # - id: 307546
+      #   name: input307546
+      #   note: Patio Door Switch (Lower Left)
+
+      - id: 352347
+        name: output352347
+        note: Master Bedroom Headrest Light
+
+      - id: 395355
+        name: output395355
+        note: Guest Bedroom Wall Outlet
+
+      - id: 392539
+        name: output392539
+        note: Game Room PC Outlet
+
+      - id: 112987
+        name: output112987
+        note: Kids Bedroom Bedside Light
+
+    binary_sensor:
+      - id: 23130
+        name: input23130
+        note: Kitchen Entrance Wall Lower Left
+
+      - id: 23386
+        name: input23386
+        note: Kitchen Entrance Wall Lower right
+
+      - id: 228698
+        name: input228698
+        note: Common Room End Wall Right Switch
+
+# Google Calendar
+
+google:
+  client_id: !secret google_calendar_client_id
+  client_secret: !secret google_calendar_client_secret
+
+withings:
+  client_id: !secret withings_client_id
+  client_secret: !secret withings_client_secret
+  use_webhook: true
+
+pyscript:
+  allow_all_imports: true
+  hass_is_global: true
+
+input_select:
+  living_room_tv_remote:
+    name: Living Room TV Remote
+    options:
+      - PowerOff
+      - Watch TV
+      - Watch Smart TV
+      - Watch a Movie
+      - Watch Apple TV
+      - Listen to Music
+      - Play Xbox
+    icon: mdi:remote
+
+input_boolean:
+  home_occupancy_bbd_1plus8t:
+    name: Indicate that Bjarne is home
+    icon: mdi:cellphone
+
+  home_occupancy_ld_iphonexs:
+    name: Indicate that Liset is home
+    icon: mdi:cellphone
+
+  home_occupancy_jbd_iphone11:
+    name: Indicate that Jonas is home
+    icon: mdi:cellphone
+
+timer:
+  testtimer:
+    name: "Test Timer for 45 seconds"
+    icon: mdi:camera-timer
+    duration: "00:00:45"
+  luminosity_timer:
+    name: "Living Room Luminosity 30 Minutes Timer "
+    icon: mdi:camera-timer
+    duration: "00:30:00"
