@@ -11,4 +11,4 @@ Please note that this is work and doesn't necessarily represent best practices a
 I use Docker to host my Home Assistant setup on a Raspberry Pi. I've included my Docker Compose file for reference. I keep API keys, username, password and other sensitive information in a separate .env file (not included).
 
 ## Ansible
-I use Ansible to configure and maintain my Raspberry Pi's.
+I use Ansible to configure and maintain my Raspberry Pi's. I'll add my books soon....
